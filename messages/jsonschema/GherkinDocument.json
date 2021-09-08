@@ -338,6 +338,7 @@
       "required": [
         "location",
         "keyword",
+        "keyword_type",
         "text",
         "id"
       ],
@@ -347,7 +348,19 @@
           "description": "The location of the steps' `keyword`"
         },
         "keyword": {
+          "description": "The actual keyword as it appeared in the source.",
           "type": "string"
+        },
+        "keywordType": {
+          "description": "The keyword as it is known in the Gherkin grammar that the value from the `keyword` field is associated with.",
+          "type": "string",
+          "enum": [
+            "Given",
+            "When",
+            "Then",
+            "But",
+            "And"
+          ]
         },
         "text": {
           "type": "string"

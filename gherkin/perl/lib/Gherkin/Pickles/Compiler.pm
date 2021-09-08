@@ -50,6 +50,14 @@ sub _pickle_steps {
     return [ map { $class->_pickle_step( $_, $id_generator ) } @$steps ];
 }
 
+my %inheriting_keyword = (
+    Given   => 0,
+    When    => 0,
+    Then    => 0,
+    And     => 1,
+    But     => 1,
+    );
+
 sub _compile_scenario {
     my ( $class, $uri, $tags, $background_steps,
          $scenario, $variables, $values, $values_id,
@@ -58,6 +66,7 @@ sub _compile_scenario {
 
     my @steps;
     if ($scenario->steps and @{ $scenario->steps }) {
+        my $last_keyword;
         @steps = @{ $class->_pickle_steps($background_steps,
                                           $id_generator) };
         for my $step (@{ $scenario->steps } ) {
@@ -68,9 +77,17 @@ sub _compile_scenario {
                 $class->_create_pickle_arguments(
                     $step,
                     $variables, $values );
+
+            $last_keyword =
+                $inheriting_keyword{$step->keyword_type} ?
+                $last_keyword : $step->keyword_type;
+
+            #TODO: Throw an exception here when $last_keyword is empty
+
             push @steps,
                 Cucumber::Messages::PickleStep->new(
                     id         => $id_generator->(),
+                    keyword    => $last_keyword,
                     text       => $step_text,
                     argument   => $arguments,
                     ast_node_ids => [ $step->id,

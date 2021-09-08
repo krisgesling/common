@@ -6,7 +6,7 @@ use warnings;
 use Class::XSAccessor
   constructor => 'new',
   accessors   => [
-    qw/line location/,
+    qw/line location keyword_type/,
     map { "matched_$_" } qw/type keyword indent items text gherkin_dialect/
   ],
   ;

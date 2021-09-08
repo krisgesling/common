@@ -1594,6 +1594,7 @@ use Scalar::Util qw( blessed );
 my %types = (
    location => 'Cucumber::Messages::Location',
    keyword => 'string',
+   keyword_type => '',
    text => 'string',
    doc_string => 'Cucumber::Messages::DocString',
    data_table => 'Cucumber::Messages::DataTable',
@@ -1623,6 +1624,7 @@ has location =>
 
 =head4 keyword
 
+The actual keyword as it appeared in the source.
 
 =cut
 
@@ -1630,6 +1632,45 @@ has keyword =>
     (is => 'ro',
      required => 1,
      default => sub { '' },
+    );
+
+
+=head4 keyword_type
+
+The keyword as it is known in the Gherkin grammar that the value from the `keyword` field is associated with.
+
+
+Available constants for valid values of this field:
+
+=over
+
+=item * KEYWORD_TYPE_GIVEN
+
+=item * KEYWORD_TYPE_WHEN
+
+=item * KEYWORD_TYPE_THEN
+
+=item * KEYWORD_TYPE_BUT
+
+=item * KEYWORD_TYPE_AND
+
+=back
+
+=cut
+
+
+use constant
+   KEYWORD_TYPE_GIVEN => 'Given',
+   KEYWORD_TYPE_WHEN => 'When',
+   KEYWORD_TYPE_THEN => 'Then',
+   KEYWORD_TYPE_BUT => 'But',
+   KEYWORD_TYPE_AND => 'And',
+   ;
+
+has keyword_type =>
+    (is => 'ro',
+     required => 1,
+     default => sub { KEYWORD_TYPE_GIVEN },
     );
 
 
@@ -2750,6 +2791,7 @@ my %types = (
    argument => 'Cucumber::Messages::PickleStepArgument',
    ast_node_ids => '[]string',
    id => 'string',
+   keyword => '',
    text => 'string',
 );
 
@@ -2795,6 +2837,41 @@ has id =>
     (is => 'ro',
      required => 1,
      default => sub { '' },
+    );
+
+
+=head4 keyword
+
+The context in which the step was specified: context (Given), action (When) or outcome (Then).
+
+Note that the keywords `But` and `And` inherit their contextual meaning from prior steps and can therefore not appear in the pickle (as the picle is considered to be the execution plan).
+
+
+Available constants for valid values of this field:
+
+=over
+
+=item * KEYWORD_GIVEN
+
+=item * KEYWORD_WHEN
+
+=item * KEYWORD_THEN
+
+=back
+
+=cut
+
+
+use constant
+   KEYWORD_GIVEN => 'Given',
+   KEYWORD_WHEN => 'When',
+   KEYWORD_THEN => 'Then',
+   ;
+
+has keyword =>
+    (is => 'ro',
+     required => 1,
+     default => sub { KEYWORD_GIVEN },
     );
 
 

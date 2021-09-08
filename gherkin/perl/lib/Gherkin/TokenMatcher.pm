@@ -113,6 +113,8 @@ sub _set_token_matched {
 
     $token->matched_keyword( $options->{'keyword'} )
       if defined $options->{'keyword'};
+    $token->keyword_type( $options->{'keyword_type'} )
+      if defined $options->{'keyword_type'};
 
     if ( defined $options->{'indent'} ) {
         $token->matched_indent( $options->{'indent'} );
@@ -176,14 +178,19 @@ sub _unescaped_docstring {
 
 sub match_StepLine {
     my ( $self, $token ) = @_;
-    my @keywords = map { @{ $self->dialect->$_ } } qw/Given When Then And But/;
 
-    for my $keyword (@keywords) {
-        if ( $token->line->startswith($keyword) ) {
-            my $title = $token->line->get_rest_trimmed( length($keyword) );
-            $self->_set_token_matched( $token,
-                StepLine => { text => $title, keyword => $keyword } );
-            return 1;
+    for my $keyword_type (qw/Given When Then And But/) {
+        for my $keyword (@{ $self->dialect->$keyword_type() }) {
+            if ( $token->line->startswith($keyword) ) {
+                my $title = $token->line->get_rest_trimmed( length($keyword) );
+                $self->_set_token_matched( $token,
+                                           StepLine => {
+                                               text         => $title,
+                                               keyword      => $keyword,
+                                               keyword_type => $keyword_type,
+                                           } );
+                return 1;
+            }
         }
     }
     return;
